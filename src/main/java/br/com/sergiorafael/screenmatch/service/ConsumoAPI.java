@@ -1,5 +1,7 @@
 package br.com.sergiorafael.screenmatch.service;
 
+import br.com.sergiorafael.screenmatch.exception.ApiCommunicationException; // <-- ESTE IMPORT DEVE ESTAR AQUI
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -12,14 +14,19 @@ public class ConsumoAPI {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(endereco))
                 .build();
-        HttpResponse<String> response = null;
+        HttpResponse<String> response;
         try {
-            response = client
-                    .send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            // Aqui, você USA o nome SIMPLES da classe, pois ela foi importada acima
+            throw new ApiCommunicationException("Erro ao comunicar com a API no endereço: " + endereco, e);
+        }
+
+        // Verifica o código de status HTTP
+        if (response.statusCode() != 200) {
+            throw new ApiCommunicationException("Falha na requisição para " + endereco +
+                    ". Código de status: " + response.statusCode() +
+                    " - Resposta: " + response.body());
         }
 
         String json = response.body();

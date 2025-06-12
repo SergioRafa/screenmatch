@@ -10,7 +10,7 @@ public class DadosSerie {
     @JsonAlias("totalSeasons")
     Integer totalTemporadas;
     @JsonAlias("imdbRating")
-    String avalia;
+    String avalia; // <-- Voltou para String
 
     public String getTitulo() {
         return titulo;
@@ -24,12 +24,21 @@ public class DadosSerie {
         return avalia;
     }
 
+    // Adicione um método para obter a avaliação como Double, tratando "N/A"
+    public Double getAvaliaNumerica() {
+        try {
+            return Double.valueOf(avalia);
+        } catch (NumberFormatException e) {
+            return 0.0; // Ou null, dependendo de como você quer tratar N/A
+        }
+    }
+
     @Override
     public String toString() {
         return "DadosSerie{" +
                 "titulo='" + titulo + '\'' +
                 ", totalTemporadas=" + totalTemporadas +
-                ", avalia='" + avalia + '\'' +
+                ", avalia='" + avalia + '\'' + // Continua como String para o toString
                 '}';
     }
 }
